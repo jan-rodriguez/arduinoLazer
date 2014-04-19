@@ -151,11 +151,11 @@ boolean* setup_pic_mat()
   for(int i = 0; i < imageHeight; i++) {
     for(int j = 0; j < imageWidth; j++) {
       //Wait for data to be written
-      delay(100);
+      delay(50);
       if(Serial.available()){
          value = Serial.read();
       }
-      Serial.println(value);
+      //Serial.println(value);
       matValue = value == '1';
       set_matrix_position(j, i, imageWidth, pixMatrix, matValue);
     } 

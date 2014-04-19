@@ -30,7 +30,7 @@ def waitAndReturnSerialData():
 
   #Loop while until we get data back from the arduino
   while(stillWaiting):
-    sleep(.1)
+    sleep(.05)
     #Read data and exit loop
     if(ser.inWaiting()):
       returnVal = ser.readline().rstrip()
@@ -72,8 +72,7 @@ def sendPictureInfo(image):
         ser.write('1')
       else:
         ser.write('0')
-      print waitAndReturnSerialData(),
-    print '\n'
+      #print waitAndReturnSerialData(),
   print '---------------------------\n'
   return 
 
