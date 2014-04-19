@@ -19,6 +19,9 @@ int myX[] = { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40 };
 int incX=0;
 int incY=0;
 
+int scale = 100;
+int matrixWidth;
+int matrixHeight;
 boolean* picMatrix;
 
 PS2 mouse(6, 5);
@@ -91,6 +94,8 @@ void set_height_and_width(int* height, int* width) {
   
   Serial.println(imageWidth);
   *width = imageWidth.toInt();
+  
+  matrixWidth = imageWidth.toInt();
   //Wait until serial data is received
   delay(1000);
   
@@ -109,6 +114,7 @@ void set_height_and_width(int* height, int* width) {
   
   Serial.println(imageHeight);
   *height = imageHeight.toInt();
+  matrixHeight = imageHeight.toInt();
   
   
 }
@@ -116,6 +122,16 @@ void set_height_and_width(int* height, int* width) {
 void set_matrix_position(int col, int row, int width, boolean* matrix, boolean value) {
   
   matrix[ row * width + col ] = value;  
+}
+
+boolean get_matrix_position(int col, int row, int width, int height, boolean* matrix) {
+  //Check bounds
+  if(col >= 0 && col < width && row >= 0 && row < height) {
+    return matrix[ row * width + col ];
+  }
+  
+  return false;
+  
 }
 
 boolean* setup_pic_mat()
@@ -145,15 +161,16 @@ boolean* setup_pic_mat()
     } 
   }
   
-  for(int i = 0; i < imageHeight; i++) {
-    for(int j = 0; j < imageWidth; j++) {
-      if( pixMatrix[ i * imageWidth + j ]) {
-        Serial.println('1'); 
-      }else{
-        Serial.println('0'); 
-      }
-    }
-  }
+  
+//  for(int i = 0; i < imageHeight; i++) {
+//    for(int j = 0; j < imageWidth; j++) {
+//      if( pixMatrix[ i * imageWidth + j ]) {
+//        Serial.println('1'); 
+//      }else{
+//        Serial.println('0'); 
+//      }
+//    }
+//  }
   
   return pixMatrix;
   
@@ -197,12 +214,22 @@ void loop()
   posX= posX + incX;
   posY= posY + incY;
 
-//  Serial.print(posX);
-//  Serial.print(",");
-//  Serial.print(posY);
-//  Serial.println();
+  Serial.print(posX / scale);
+  Serial.print(",");
+  Serial.print(posY / scale);
+  Serial.println();
   
   int val = Serial.read();
+  
+  if(get_matrix_position(posX / scale, posY / scale, matrixWidth, matrixHeight, picMatrix)){
+   
+    digitalWrite(led,HIGH); 
+    
+  }else{
+  
+   digitalWrite(led, LOW); 
+    
+  }
   
 //  if(val>0){
 //    Serial.println(val);

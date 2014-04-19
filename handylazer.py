@@ -75,12 +75,14 @@ def sendPictureInfo(image):
       print waitAndReturnSerialData(),
     print '\n'
   print '---------------------------\n'
-  for x in range(image.size[0]):
-    for y in range(image.size[1]):
-      print waitAndReturnSerialData(),
-    print '\n'
-
   return 
+
+
+def continuousRead():
+  while True:
+    if(ser.inWaiting()):
+      val = ser.readline().rstrip()
+      print val
 
 
 im = Image.open("checkers.gif")
@@ -91,8 +93,8 @@ ser = serial.Serial("/dev/ttyACM0", 9600)   # open serial port that Arduino is u
 if(ser.isOpen()):
 
   sendPing(ser)
-  sendPictureInfo(im);
-
-ser.close();
+  sendPictureInfo(im)
+  continuousRead()
+ser.close()
 
 print "closed"
