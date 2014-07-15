@@ -26,6 +26,13 @@ boolean* picMatrix;
 
 PS2 mouse(6, 5);
 
+struct Rect {
+  int top;
+  int bottom;
+  int left;
+  int right;
+};
+
 /*
  * initialize the mouse. Reset it, and place it into remote
  * mode, so we can get the encoder data on demand.
@@ -59,15 +66,6 @@ void wait_for_ping()
   }
 }
 
-int receive_and_ack(){
-  
-  while(true)
-  {
-    return 0;
-  }
-  
-  return -1;
-}
 
 void set_height_and_width(int* height, int* width) {
   
@@ -176,13 +174,113 @@ boolean* setup_pic_mat()
   
 }
 
+boolean within_rect(struct Rect rect, int x, int y){
+  return x > rect.left && x < rect.right && y > rect.top && y > rect.bottom;
+}
+
+boolean* generate_mit() {
+  int matHeight = 150;
+  int matWidth = 200;
+  
+  int marg = 10;
+  
+  int xOffset = 20;
+  int yOffset = 20;
+  
+  int barHeight = 80;
+  int barWidth = 20;
+  
+  boolean picMat[matHeight * matWidth];
+  
+  Rect mBar1;
+  mBar1.top = yOffset;
+  mBar1.bottom = yOffset + barHeight;
+  mBar1.left = xOffset;
+  mBar1.right = xOffset + barWidth;
+  
+  Rect mBar2;
+  mBar2.top = yOffset;
+  mBar2.bottom = yOffset + ((3 * barHeight ) / 4);
+  mBar2.left = (xOffset + barWidth + marg);
+  mBar2.right = (xOffset + (2 * barWidth) + marg);
+  
+  Rect mBar3;
+  mBar3.top = yOffset;
+  mBar3.bottom = yOffset + barHeight;
+  mBar3.left = (xOffset + barWidth + marg);
+  mBar3.right = (xOffset + (2 * barWidth) + marg);
+
+  Rect iDot;
+  iDot.top = yOffset;
+  iDot.bottom = yOffset + (barHeight / 5);
+  iDot.left = xOffset + (3 * barWidth) + (3 * marg);
+  iDot.right = xOffset + (4 * barWidth) + (3 * marg);
+
+  Rect iBottom;
+  iBottom.top = yOffset + (barHeight / 5) + marg;
+  iBottom.bottom = yOffset + barHeight;
+  iBottom.left = xOffset + (3 * barWidth) + (3 * marg);
+  iBottom.right = xOffset + (4 * barWidth) + (3 * marg);
+
+  Rect tTop;
+  tTop.top = yOffset;
+  tTop.bottom = yOffset + (barHeight / 5);
+  tTop.left = xOffset + (4 * barWidth) + (4 * marg);
+  tTop.right = xOffset + (6 * barWidth) + (4 * marg);
+
+  Rect tBottom;
+  tBottom.top = yOffset + (barHeight / 5) + marg;
+  tBottom.bottom = yOffset + barHeight;
+  tBottom.left = xOffset + (4 * barWidth) + (4 * marg);
+  tBottom.right = xOffset + (5 * barWidth) + (4 * marg);
+
+  
+  for(int y = 0; y < matHeight; ++y){
+    for(int x = 0; x < matWidth; ++x){
+      //First bar in M
+      if(within_rect(mBar1, x, y)) {
+        set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      //Second bar in M
+      else if(within_rect(mBar2, x, y)){
+          set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      //Third bar in M
+      else if(within_rect(mBar3, x, y)){
+        set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      //I dot
+      else if(within_rect(iDot, x, y)){
+        set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      //Top of I
+      else if(within_rect(iBottom, x, y)){
+        set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      //Top of T
+      else if(within_rect(tTop, x, y)){
+        set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      //Rest of T
+      else if(within_rect(tBottom, x, y)){
+        set_matrix_position(x, y, matWidth, picMat, true);
+      }
+      else{ //default to false
+      	set_matrix_position(x, y, matWidth, picMat, false);
+      }
+    
+    }
+  }
+}
+
 void setup()
 {
   pinMode(led, OUTPUT); 
   Serial.begin(9600);
-  wait_for_ping();
+  //wait_for_ping();
   //Set up the picture Matrix
-  picMatrix = setup_pic_mat();
+  //picMatrix = setup_pic_mat();
+  picMatrix = generate_mit();
   mouse_init();
 
 }
@@ -231,33 +329,4 @@ void loop()
     
   }
   
-//  if(val>0){
-//    Serial.println(val);
-//  }
-
-//for (int i=0; i<10; i++)
-//{
-//  if (posX == myX[i])
-//   {
-//     digitalWrite(led, HIGH);
-//     delay(10);
-//   }
-//  else
-//  {
-//    digitalWrite(led, LOW);
-//    delay(10);
-//  }
-//}
-
-  /* send the data back up */
-//  Serial.print(mstat, BIN);
-//  Serial.print("\tX=");
-//  Serial.print(mx, DEC);
-//  Serial.print("\tY=");
-//  Serial.print(my, DEC);
-//  Serial.println();
-
-
-
-//  delay(20);  /* twiddle */
 }
