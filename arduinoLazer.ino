@@ -271,6 +271,8 @@ boolean* generate_mit() {
     
     }
   }
+
+  return picMat;
 }
 
 void setup()
