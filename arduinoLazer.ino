@@ -11,20 +11,23 @@
  * Pin 5 is the mouse data pin, pin 6 is the clock pin
  * Feel free to use whatever pins are convenient.
  */
+PS2 mouse(6, 5);
+
 int posX=0;
 int posY=0;
+int prevPosX = 0;
+int prevPosY = 0;
 int led = 13;
 int myX[] = { 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40 };
 
 int incX=0;
 int incY=0;
 
-int scale = 100;
+int scale = 50;
 int matrixWidth;
 int matrixHeight;
 boolean* picMatrix;
 
-PS2 mouse(6, 5);
 
 struct Rect {
   int top;
@@ -175,20 +178,24 @@ boolean* setup_pic_mat()
 }
 
 boolean within_rect(struct Rect rect, int x, int y){
-  return x > rect.left && x < rect.right && y > rect.top && y > rect.bottom;
+  return x >= rect.left && x <= rect.right && y >= rect.top && y >= rect.bottom;
 }
 
 boolean* generate_mit() {
-  int matHeight = 150;
-  int matWidth = 200;
+  int matHeight = 15;
+  int matWidth = 20;
   
-  int marg = 10;
+  //MAKE SURE THE MATIX KNOWS WHAT THE HEIGHT AND WIDTH ARE
+  matrixWidth = matWidth;
+  matrixHeight = matHeight;
   
-  int xOffset = 20;
-  int yOffset = 20;
+  int marg = 1;
   
-  int barHeight = 80;
-  int barWidth = 20;
+  int xOffset = 1;
+  int yOffset = 1;
+  
+  int barHeight = 8;
+  int barWidth = 2;
   
   boolean picMat[matHeight * matWidth];
   
@@ -239,18 +246,38 @@ boolean* generate_mit() {
     for(int x = 0; x < matWidth; ++x){
       //First bar in M
       if(within_rect(mBar1, x, y)) {
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print("is now true");
+        Serial.println();
         set_matrix_position(x, y, matWidth, picMat, true);
       }
       //Second bar in M
       else if(within_rect(mBar2, x, y)){
-          set_matrix_position(x, y, matWidth, picMat, true);
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print("is now true");
+        Serial.println();
+        set_matrix_position(x, y, matWidth, picMat, true);
       }
       //Third bar in M
       else if(within_rect(mBar3, x, y)){
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print("is now true");
+        Serial.println();
         set_matrix_position(x, y, matWidth, picMat, true);
       }
       //I dot
       else if(within_rect(iDot, x, y)){
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print("is now true");
+        Serial.println();
         set_matrix_position(x, y, matWidth, picMat, true);
       }
       //Top of I
@@ -268,7 +295,6 @@ boolean* generate_mit() {
       else{ //default to false
       	set_matrix_position(x, y, matWidth, picMat, false);
       }
-    
     }
   }
 
@@ -313,20 +339,23 @@ void loop()
   
   posX= posX + incX;
   posY= posY + incY;
-
-  Serial.print(posX / scale);
-  Serial.print(",");
-  Serial.print(posY / scale);
-  Serial.println();
   
-  int val = Serial.read();
+  if(prevPosX != posX / scale || prevPosY != posY / scale){
+    Serial.print(posX / scale);
+    Serial.print(",");
+    Serial.print(posY / scale);
+    Serial.println();
+    prevPosX = posX / scale;
+    prevPosY = posY / scale;
+  }
   
-  if(get_matrix_position(posX / scale, posY / scale, matrixWidth, matrixHeight, picMatrix)){
-   
+  //int val = Serial.read();
+  
+  if(get_matrix_position(prevPosX, prevPosY, matrixWidth, matrixHeight, picMatrix)){
     digitalWrite(led,HIGH); 
     
   }else{
-  
+    
    digitalWrite(led, LOW); 
     
   }
